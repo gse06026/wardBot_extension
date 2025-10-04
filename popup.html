@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ward Bot</title>
+  <style>
+    body {
+      width: 350px;
+      font-family: sans-serif;
+      padding: 10px;
+    }
+    .header { 
+      text-align: center; 
+      margin-bottom: 10px; 
+    }
+    .main-action, .notebook { 
+      margin-bottom: 15px; 
+    }
+    h4 { 
+      margin-top: 0; 
+      margin-bottom: 5px; 
+    }
+    textarea { 
+      width: 98%; 
+      box-sizing: border-box; 
+      margin-bottom: 10px; 
+    }
+    #questionInput { 
+      height: 60px; 
+    }
+    #notePad { 
+      height: 120px; 
+    }
+    button { 
+      width: 100%; 
+      padding: 10px; 
+      background-color: #007bff; 
+      color: white; 
+      border: none; 
+      cursor: pointer; 
+      border-radius: 4px; 
+    }
+    button:hover { 
+      background-color: #0056b3; 
+    }
+    .note-buttons { 
+      display: flex; 
+      gap: 10px; 
+    }
+    .note-buttons button { 
+      background-color: #17a2b8; 
+    }
+    .note-buttons button:hover { 
+      background-color: #138496; 
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h3>Ward Bot 🤖</h3>
+  </div>
+
+  <div class="main-action">
+    <h4>1. Ask about this page</h4>
+    <textarea id="questionInput" placeholder="e.g., Explain the concept of 'VPC'..."></textarea>
+    <button id="searchButton">Find on Page</button>
+  </div>
+
+  <div class="notebook">
+    <h4>2. AI Study Note</h4>
+    <textarea id="notePad" placeholder="Copy-paste text here from any source, or from your findings above..."></textarea>
+    <div class="note-buttons">
+      <button id="summarizeButton">Summarize</button>
+      <button id="quizButton">Make a Quiz</button>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

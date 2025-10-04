@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ward Bot Settings</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .container { max-width: 400px; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; }
+    input { width: 100%; padding: 8px; margin-bottom: 15px; }
+    button { padding: 10px 15px; background-color: #28a745; color: white; border: none; cursor: pointer; }
+    #status { margin-top: 15px; color: green; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Ward Bot Settings</h2>
+    <label for="interest">My Interest:</label>
+    <input type="text" id="interest" placeholder="e.g., League of Legends, Soccer, Cooking...">
+    <button id="saveButton">Save</button>
+    <div id="status"></div>
+  </div>
+  <script src="options.js"></script>
+</body>
+</html>
