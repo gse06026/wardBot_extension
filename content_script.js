@@ -23,6 +23,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
   }
 
+  if (request.action === "clearHighlights") {
+    try {
+      removeHighlights();
+      sendResponse({ success: true });
+    } catch (error) {
+      console.error("Error clearing highlights:", error);
+      sendResponse({ success: false, error: error.message });
+    }
+  }
+
   if (request.action === "runAnalogyTutor") {
     chrome.storage.sync.get('userInterest', async (data) => {
       const interest = data.userInterest || 'a simple everyday object';
@@ -96,7 +106,6 @@ function getTextNodes(parent, searchText) {
   );
 
   const cleanSearchText = searchText.replace(/…/g, '').replace(/\.{3}/g, '').trim();
-  const minLength = Math.min(50, Math.floor(cleanSearchText.length * 0.5));
   const searchWords = cleanSearchText.toLowerCase().split(/\s+/).filter(w => w.length > 3);
 
   let node;
@@ -107,7 +116,7 @@ function getTextNodes(parent, searchText) {
       textNodes.push(node);
     } else if (searchWords.length >= 3) {
       const matchCount = searchWords.filter(word => nodeText.includes(word)).length;
-      if (matchCount >= Math.ceil(searchWords.length * 0.6)) {
+      if (matchCount >= Math.max(3, Math.ceil(searchWords.length * 0.7))) {
         textNodes.push(node);
       }
     }
@@ -175,11 +184,21 @@ function showAnalogyResult(analogy) {
     font-family: sans-serif;
   `;
 
-  modal.innerHTML = `
-    <h3 style="margin-top: 0;">🤖 Ward Bot Analogy Tutor</h3>
-    <p>${analogy.replace(/\n/g, '<br>')}</p>
-    <button id="wardbot-close-modal" style="margin-top: 10px; padding: 5px 10px;">Close</button>
-  `;
+  const title = document.createElement('h3');
+  title.style.marginTop = '0';
+  title.textContent = '🤖 Ward Bot Analogy Tutor';
+
+  const content = document.createElement('p');
+  content.innerHTML = analogy.replace(/\n/g, '<br>');
+
+  const closeBtn = document.createElement('button');
+  closeBtn.id = 'wardbot-close-modal';
+  closeBtn.style.cssText = 'margin-top: 10px; padding: 5px 10px;';
+  closeBtn.textContent = 'Close';
+
+  modal.appendChild(title);
+  modal.appendChild(content);
+  modal.appendChild(closeBtn);
 
   document.body.appendChild(modal);
 

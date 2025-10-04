@@ -1,5 +1,14 @@
 let aiModel = null;
 
+document.getElementById('clearButton').addEventListener('click', async () => {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  chrome.tabs.sendMessage(tab.id, { action: "clearHighlights" }, (_response) => {
+    if (chrome.runtime.lastError) {
+      console.error("Could not clear highlights:", chrome.runtime.lastError.message);
+    }
+  });
+});
+
 document.getElementById('searchButton').addEventListener('click', async () => {
   const question = document.getElementById('questionInput').value;
   if (!question) {
@@ -44,23 +53,24 @@ document.getElementById('searchButton').addEventListener('click', async () => {
     if (!contextResponse || !contextResponse.pageText) {
       throw new Error("Could not retrieve page text.");
     }
-    const pageContext = contextResponse.pageText;
+    const pageContext = contextResponse.pageText.substring(0, 15000);
 
     if (!aiModel) {
       aiModel = await LanguageModel.create();
     }
 
-    const prompt = `You are a helpful research assistant called "Ward Bot".
-From the following text, find the THREE most relevant sentences that answer the user's question.
-Each sentence should be 1-3 sentences long (maximum 150 characters).
-Return ONLY a JSON array of strings. Each string MUST be an EXACT COPY from the original text - do not add "..." or summarize.
+    const prompt = `Extract THREE exact quotes from the text below that answer this question: "${question}"
 
-TEXT FROM WEBPAGE:
+STRICT RULES:
+- Copy EXACT text from original (word-for-word, character-for-character)
+- Each quote: 50-150 characters long
+- NO ellipsis (...), NO "...", NO summarizing, NO paraphrasing
+- Return ONLY valid JSON array format: ["quote1", "quote2", "quote3"]
+
+TEXT:
 ${pageContext}
 
-USER QUESTION: "${question}"
-
-Return JSON array with exact quotes:`;
+JSON array:`;
 
     const schema = {
       "type": "array",
