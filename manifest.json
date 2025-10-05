@@ -4,7 +4,19 @@
   "version": "0.1.0",
   "description": "Your AI-powered research support.",
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "ward.png",
+      "32": "ward.png",
+      "48": "ward.png",
+      "128": "ward.png"
+    }
+  },
+  "icons": {
+    "16": "ward.png",
+    "32": "ward.png",
+    "48": "ward.png",
+    "128": "ward.png"
   },
   "options_page": "options.html",
   "background": {
