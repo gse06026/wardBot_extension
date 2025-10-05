@@ -118,7 +118,7 @@ JSON response:`;
     alert(`An error occurred: ${error.message}`);
   } finally {
     searchButton.disabled = false;
-    searchButton.textContent = 'Find Answers (Search)';
+    searchButton.textContent = 'Find on Page';
   }
 });
 

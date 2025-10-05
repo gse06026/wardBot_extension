@@ -174,36 +174,101 @@ function showAnalogyResult(analogy) {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 400px;
+    width: 420px;
+    max-width: 90vw;
+    max-height: 80vh;
     background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+    border-radius: 16px;
+    padding: 0;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    z-index: 99999;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  `;
+
+  const header = document.createElement('div');
+  header.style.cssText = `
+    background: linear-gradient(to right, #4361ee, #3a56d4);
+    color: white;
     padding: 20px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    z-index: 9999;
-    font-family: sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   `;
 
   const title = document.createElement('h3');
-  title.style.marginTop = '0';
+  title.style.cssText = `
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+  `;
   title.textContent = '🤖 Ward Bot Analogy Tutor';
 
-  const content = document.createElement('p');
+  header.appendChild(title);
+  modal.appendChild(header);
+
+  const content = document.createElement('div');
+  content.style.cssText = `
+    padding: 25px;
+    overflow-y: auto;
+    flex-grow: 1;
+    line-height: 1.6;
+    font-size: 1rem;
+  `;
   content.innerHTML = analogy.replace(/\n/g, '<br>');
+
+  modal.appendChild(content);
+
+  const footer = document.createElement('div');
+  footer.style.cssText = `
+    padding: 15px 25px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    justify-content: flex-end;
+  `;
 
   const closeBtn = document.createElement('button');
   closeBtn.id = 'wardbot-close-modal';
-  closeBtn.style.cssText = 'margin-top: 10px; padding: 5px 10px;';
+  closeBtn.style.cssText = `
+    padding: 10px 20px;
+    background: linear-gradient(to right, #6c757d, #5a6268);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  `;
   closeBtn.textContent = 'Close';
 
-  modal.appendChild(title);
-  modal.appendChild(content);
-  modal.appendChild(closeBtn);
+  closeBtn.addEventListener('mouseenter', () => {
+    closeBtn.style.background = 'linear-gradient(to right, #5a6268, #495057)';
+    closeBtn.style.transform = 'translateY(-2px)';
+  });
+
+  closeBtn.addEventListener('mouseleave', () => {
+    closeBtn.style.background = 'linear-gradient(to right, #6c757d, #5a6268)';
+    closeBtn.style.transform = 'translateY(0)';
+  });
+
+  footer.appendChild(closeBtn);
+  modal.appendChild(footer);
 
   document.body.appendChild(modal);
 
   document.getElementById('wardbot-close-modal').addEventListener('click', () => {
     modal.remove();
+  });
+  
+  // Allow closing with ESC key
+  document.addEventListener('keydown', function closeOnEsc(event) {
+    if (event.key === 'Escape') {
+      modal.remove();
+      document.removeEventListener('keydown', closeOnEsc);
+    }
   });
 }
 

@@ -3,75 +3,222 @@
 <head>
   <title>Ward Bot</title>
   <style>
-    body {
-      width: 350px;
-      font-family: sans-serif;
-      padding: 10px;
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --secondary: #4cc9f0;
+      --accent: #f72585;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gray: #6c757d;
+      --light-gray: #e9ecef;
+      --border-radius: 12px;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
     }
+    
+    body {
+      width: 380px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+      color: var(--dark);
+      box-sizing: border-box;
+    }
+
+    .container {
+      max-width: 100%;
+    }
+
     .header { 
       text-align: center; 
-      margin-bottom: 10px; 
+      margin-bottom: 20px; 
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--light-gray);
     }
-    .main-action, .notebook { 
-      margin-bottom: 15px; 
+
+    .header h3 {
+      margin: 0;
+      font-size: 1.8rem;
+      color: var(--primary);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
     }
-    h4 { 
-      margin-top: 0; 
-      margin-bottom: 5px; 
+
+    .card {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      margin-bottom: 20px;
+      transition: var(--transition);
     }
+
+    .card:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-2px);
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 0;
+      margin-bottom: 15px;
+      color: var(--primary);
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .card-title::before {
+      content: attr(data-step);
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      background-color: var(--primary);
+      color: white;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 24px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
     textarea { 
-      width: 98%; 
+      width: 100%; 
       box-sizing: border-box; 
-      margin-bottom: 10px; 
+      margin-bottom: 15px;
+      padding: 12px;
+      border: 1px solid var(--light-gray);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+      min-height: 80px;
+      transition: var(--transition);
     }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 3px rgba(76, 201, 240, 0.2);
+    }
+
     #questionInput { 
-      height: 60px; 
+      height: 80px; 
     }
+
     #notePad { 
       height: 120px; 
     }
-    button { 
+
+    .btn {
       width: 100%; 
-      padding: 10px; 
-      background-color: #007bff; 
-      color: white; 
+      padding: 12px; 
       border: none; 
+      border-radius: 8px; 
       cursor: pointer; 
-      border-radius: 4px; 
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: var(--transition);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    button:hover { 
-      background-color: #0056b3; 
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary { 
+      background: linear-gradient(to right, var(--primary), var(--primary-dark)); 
+      color: white; 
+    }
+
+    .btn-primary:hover { 
+      background: linear-gradient(to right, var(--primary-dark), #2a4bc9); 
+    }
+
+    .btn-secondary { 
+      background: linear-gradient(to right, var(--secondary), #3aa8d0); 
+      color: white; 
+    }
+
+    .btn-secondary:hover { 
+      background: linear-gradient(to right, #3aa8d0, #2d96c0); 
+    }
+
+    .btn-outline { 
+      background: transparent;
+      color: var(--gray);
+      border: 1px solid var(--light-gray);
+    }
+
+    .btn-outline:hover { 
+      background: var(--light-gray);
+      color: var(--dark);
+    }
+
     .note-buttons { 
       display: flex; 
-      gap: 10px; 
+      gap: 12px; 
     }
-    .note-buttons button { 
-      background-color: #17a2b8; 
+
+    .note-buttons .btn { 
+      flex: 1;
     }
-    .note-buttons button:hover { 
-      background-color: #138496; 
+
+    .footer {
+      text-align: center;
+      margin-top: 10px;
+      color: var(--gray);
+      font-size: 0.8rem;
+    }
+
+    .ai-badge {
+      display: inline-block;
+      background: linear-gradient(to right, var(--accent), #b5179e);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      margin-left: 8px;
     }
   </style>
 </head>
 <body>
-  <div class="header">
-    <h3>Ward Bot 🤖</h3>
-  </div>
+  <div class="container">
+    <div class="header">
+      <h3>Ward Bot <span class="ai-badge">AI</span></h3>
+      <p style="margin-top: 5px; font-size: 0.9rem; color: var(--gray);">Your AI-powered research assistant</p>
+    </div>
 
-  <div class="main-action">
-    <h4>1. Ask about this page</h4>
-    <textarea id="questionInput" placeholder="e.g., Explain the concept of 'VPC'..."></textarea>
-    <button id="searchButton">Find on Page</button>
-    <button id="clearButton" style="margin-top: 5px; background-color: #6c757d;">Clear Highlights</button>
-  </div>
+    <div class="card">
+      <h4 class="card-title" data-step="1">Ask about this page</h4>
+      <textarea id="questionInput" placeholder="e.g., Explain the concept of 'VPC'..."></textarea>
+      <button id="searchButton" class="btn btn-primary">Find on Page</button>
+      <button id="clearButton" class="btn btn-outline" style="margin-top: 10px;">Clear Highlights</button>
+    </div>
 
-  <div class="notebook">
-    <h4>2. AI Study Note</h4>
-    <textarea id="notePad" placeholder="Copy-paste text here from any source, or from your findings above..."></textarea>
-    <div class="note-buttons">
-      <button id="summarizeButton">Summarize</button>
-      <button id="quizButton">Make a Quiz</button>
+    <div class="card">
+      <h4 class="card-title" data-step="2">AI Study Note</h4>
+      <textarea id="notePad" placeholder="Copy-paste text here from any source, or from your findings above..."></textarea>
+      <div class="note-buttons">
+        <button id="summarizeButton" class="btn btn-secondary">Summarize</button>
+        <button id="quizButton" class="btn btn-secondary">Make a Quiz</button>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <p>Powered by Chrome AI &bull; Privacy-focused</p>
     </div>
   </div>
   <script src="popup.js"></script>
