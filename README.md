@@ -33,13 +33,10 @@ Ward Bot helps you research and learn more effectively by using Chrome's built-i
 - **Chrome 138+** with AI features enabled
 - Compatible hardware for Chrome Built-in AI
 
-### Steps
-1. Clone or download this repository
-2. Open Chrome and go to `chrome://extensions`
-3. Enable "Developer mode" (top right)
-4. Click "Load unpacked"
-5. Select the `wardBot_extension` folder
-6. The Ward Bot icon should appear in your toolbar
+### Install from Chrome Web Store
+1. Visit the [Ward Bot page on Chrome Web Store](#) (link coming soon)
+2. Click "Add to Chrome"
+3. The Ward Bot icon will appear in your toolbar
 
 ---
 
@@ -77,7 +74,7 @@ Ward Bot helps you research and learn more effectively by using Chrome's built-i
 ### Key Files
 ```
 wardBot_extension/
-├── manifest.json           # Extension configuration
+├── manifest.json          # Extension configuration
 ├── background.js          # Context menu handler
 ├── content_script.js      # Highlight & analogy logic
 ├── popup.html/js          # Main UI
@@ -146,11 +143,10 @@ This handles cases where AI slightly modifies text or adds ellipsis.
 ## Development
 
 ### Local Setup
-```bash
-git clone <repository-url>
-cd wardBot_extension
-# Load unpacked in Chrome
-```
+1. Open Chrome and go to `chrome://extensions`
+2. Enable "Developer mode" (top right)
+3. Click "Load unpacked"
+4. Select this `wardBot_extension` folder
 
 ### Making Changes
 1. Edit files

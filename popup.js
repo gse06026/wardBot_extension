@@ -56,21 +56,20 @@ document.getElementById('searchButton').addEventListener('click', async () => {
     const pageContext = contextResponse.pageText.substring(0, 15000);
 
     if (!aiModel) {
-      aiModel = await LanguageModel.create();
+      aiModel = await LanguageModel.create({ outputLanguage: 'en' });
     }
 
-    const prompt = `Extract THREE exact quotes from the text below that answer this question: "${question}"
+    const prompt = `You are a helpful research assistant called "Ward Bot".
+From the following text, find the THREE most relevant paragraphs that answer the user's question.
+Respond with only a JSON array of strings, where each string is an exact quote from the text. Do not add any extra text or explanations.
 
-STRICT RULES:
-- Copy EXACT text from original (word-for-word, character-for-character)
-- Each quote: 50-150 characters long
-- NO ellipsis (...), NO "...", NO summarizing, NO paraphrasing
-- Return ONLY valid JSON array format: ["quote1", "quote2", "quote3"]
-
-TEXT:
+--- TEXT FROM WEBPAGE ---
 ${pageContext}
+--- END OF TEXT ---
 
-JSON array:`;
+USER QUESTION: "${question}"
+
+JSON response:`;
 
     const schema = {
       "type": "array",
@@ -80,7 +79,8 @@ JSON array:`;
       "maxItems": 3
     };
 
-    const fullResponse = await aiModel.prompt(prompt, {
+    const fullResponse = await aiModel.prompt(prompt, { 
+      outputLanguage: 'en',
       responseConstraint: schema
     });
 
@@ -189,11 +189,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (!aiModel) {
-        aiModel = await LanguageModel.create();
+        aiModel = await LanguageModel.create({ outputLanguage: 'en' });
       }
       const prompt = `${instruction}\n\nTEXT:\n\"\"\"${text}\"\"\"`;
 
-      const response = await aiModel.prompt(prompt);
+      const response = await aiModel.prompt(prompt, { outputLanguage: 'en' });
       notePad.value = `${originalContent}\n\n--- ${type.toUpperCase()} ---\n${response}\n`;
 
     } catch (error) {

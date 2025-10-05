@@ -143,7 +143,7 @@ async function getAnalogyFromNano(concept, interest) {
   }
 
   if (!aiModel) {
-    aiModel = await LanguageModel.create();
+    aiModel = await LanguageModel.create({ outputLanguage: 'en' });
   }
 
   const prompt = `You are a creative and friendly tutor.
@@ -157,7 +157,7 @@ ${concept}
 
 **Analogy-based explanation:**`;
 
-  const response = await aiModel.prompt(prompt);
+  const response = await aiModel.prompt(prompt, { outputLanguage: 'en' });
   return response;
 }
 
