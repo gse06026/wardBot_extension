@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![License](https://img.shields.io/github/license/gse06026/ward-bot.svg)](./LICENSE)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Chrome](https://img.shields.io/badge/Chrome-138%2B-blue.svg)](https://www.google.com/chrome/)
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-orange.svg)]()
 
@@ -14,13 +14,13 @@
 
 ---
 
-## 🧭 Overview
+## Overview
 
 **Ward Bot** helps you research and learn more effectively by using **Chrome’s built-in AI** to analyze web pages, explain complex concepts through personalized analogies, and generate study materials — all locally, without sending data to external servers.
 
 ---
 
-## ✨ Features
+## Features
 
 ### 1. Context-Based Search
 
@@ -42,7 +42,7 @@
 
 ---
 
-## ⚙️ Installation
+## Installation
 
 ### Prerequisites
 
@@ -63,7 +63,7 @@
 
 ---
 
-## 🚀 Usage
+## Usage
 
 ### Basic Workflow
 
@@ -85,7 +85,7 @@
 
 ---
 
-## 🧩 Technical Details
+## Technical Details
 
 ### Architecture
 
@@ -107,7 +107,7 @@
 
 ---
 
-## 🧠 Features in Detail
+## Features in Detail
 
 ### Smart Text Matching
 
@@ -128,7 +128,7 @@
 
 ---
 
-## ⚠️ Limitations
+## Limitations
 
 - Works only on Chrome 138 + with Built-in AI
 - English-optimized responses
@@ -137,7 +137,7 @@
 
 ---
 
-## 🧩 Troubleshooting
+## Troubleshooting
 
 ### Chrome AI Unavailable
 
@@ -158,7 +158,7 @@
 
 ---
 
-## 🧰 Development & Debugging
+## Development & Debugging
 
 ### Local Setup
 
