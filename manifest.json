@@ -4,7 +4,17 @@
   "version": "0.1.0",
   "description": "Your AI-powered research support.",
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "wardIcon_lowres.png",
+      "48": "wardIcon.png",
+      "128": "wardIcon.png"
+    }
+  },
+  "icons": {
+    "16": "wardIcon_lowres.png",
+    "48": "wardIcon.png",
+    "128": "wardIcon.png"
   },
   "options_page": "options.html",
   "background": {
@@ -15,11 +25,5 @@
     "scripting",
     "storage",
     "contextMenus"
-  ],
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content_script.js"]
-    }
   ]
 }

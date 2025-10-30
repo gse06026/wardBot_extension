@@ -1,45 +1,99 @@
+async function ensureContentScript(tabId) {
+  if (!tabId) return;
+  try {
+    await chrome.scripting.executeScript({
+      target: { tabId: tabId },
+      files: ['content_script.js']
+    });
+  } catch (error) {
+    console.error('Ward Bot content script injection failed', error);
+    throw error;
+  }
+}
+
 let aiModel = null;
+
+// Centralized AI availability checking function
+async function createOrCheckAIModel(options = {}) {
+  if (typeof LanguageModel === 'undefined') {
+    throw new Error("Chrome's built-in AI is not available. Please ensure you're using Chrome 138+ with AI features enabled.");
+  }
+  
+  const availability = await LanguageModel.availability();
+  if (availability === 'unavailable') {
+    throw new Error("Chrome's built-in AI is not available. Please check that you have the required hardware and Chrome settings enabled.");
+  }
+  
+  if (availability === 'downloadable') {
+    console.log("Chrome AI model needs to be downloaded. This may take a few minutes on first use.");
+    if (!confirm("Chrome AI model needs to be downloaded for the first time. This may take a few minutes. Continue?")) {
+      throw new Error("User canceled AI download.");
+    }
+  }
+  
+  return await LanguageModel.create({ 
+    outputLanguage: options.outputLanguage || 'en',
+    ...options 
+  });
+}
+
+// Input sanitization function
+function sanitizeInput(text, maxLength = 5000) {
+  if (!text || typeof text !== 'string') {
+    throw new Error('Invalid input: text must be a string');
+  }
+  
+  // Remove potentially harmful content
+  const cleaned = text
+    .trim()
+    .substring(0, maxLength)  // Limit length
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, '');  // Remove control characters
+  
+  if (cleaned.length === 0) {
+    throw new Error('Input is empty after sanitization');
+  }
+  
+  return cleaned;
+}
 
 document.getElementById('clearButton').addEventListener('click', async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  chrome.tabs.sendMessage(tab.id, { action: "clearHighlights" }, (_response) => {
-    if (chrome.runtime.lastError) {
-      console.error("Could not clear highlights:", chrome.runtime.lastError.message);
-    }
-  });
+  try {
+    await ensureContentScript(tab.id);
+    chrome.tabs.sendMessage(tab.id, { action: "clearHighlights" }, (_response) => {
+      if (chrome.runtime.lastError) {
+        console.error("Could not clear highlights:", chrome.runtime.lastError.message);
+      }
+    });
+  } catch (error) {
+    console.error("Content script injection failed:", error);
+    alert("Could not access the page. Ward Bot may not work on this site.");
+  }
 });
 
 document.getElementById('searchButton').addEventListener('click', async () => {
-  const question = document.getElementById('questionInput').value;
+  let question = document.getElementById('questionInput').value;
   if (!question) {
     alert('Please enter a question.');
     return;
   }
 
   const searchButton = document.getElementById('searchButton');
+  const originalButtonText = searchButton.textContent; // Cache original text
   searchButton.disabled = true;
   searchButton.textContent = 'Analyzing...';
 
   try {
-    if (typeof LanguageModel === 'undefined') {
-      throw new Error("Chrome's built-in AI is not available. Please ensure you're using Chrome 138+ with AI features enabled.");
-    }
-
     if (!navigator.userActivation?.isActive) {
       throw new Error("User interaction required. Please ensure you've interacted with the page before using the AI feature.");
     }
 
-    const availability = await LanguageModel.availability();
-    if (availability === 'unavailable') {
-      throw new Error("Chrome's built-in AI is not available. Please check that you have the required hardware and Chrome settings enabled.");
-    } else if (availability === 'downloadable') {
-      console.log("Chrome AI model needs to be downloaded. This may take a few minutes on first use.");
-      if (!confirm("Chrome AI model needs to be downloaded for the first time. This may take a few minutes. Continue?")) {
-        return;
-      }
-    }
+    question = sanitizeInput(question); // Sanitize the question input
 
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+    // Inject content script before sending message
+    await ensureContentScript(tab.id);
 
     const contextResponse = await new Promise((resolve, reject) => {
       chrome.tabs.sendMessage(tab.id, { action: "getText" }, (response) => {
@@ -56,7 +110,7 @@ document.getElementById('searchButton').addEventListener('click', async () => {
     const pageContext = contextResponse.pageText.substring(0, 15000);
 
     if (!aiModel) {
-      aiModel = await LanguageModel.create({ outputLanguage: 'en' });
+      aiModel = await createOrCheckAIModel({ outputLanguage: 'en' });
     }
 
     const prompt = `You are a helpful research assistant called "Ward Bot".
@@ -79,7 +133,7 @@ JSON response:`;
       "maxItems": 3
     };
 
-    const fullResponse = await aiModel.prompt(prompt, { 
+    const fullResponse = await aiModel.prompt(prompt, {
       outputLanguage: 'en',
       responseConstraint: schema
     });
@@ -118,7 +172,7 @@ JSON response:`;
     alert(`An error occurred: ${error.message}`);
   } finally {
     searchButton.disabled = false;
-    searchButton.textContent = 'Find Answers (Search)';
+    searchButton.textContent = originalButtonText; // Restore original text
   }
 });
 
@@ -174,22 +228,10 @@ document.addEventListener('DOMContentLoaded', () => {
     notePad.value = `Generating ${type}... Please wait.`;
 
     try {
-      if (typeof LanguageModel === 'undefined') {
-        throw new Error("Chrome AI is not available. Check your browser settings.");
-      }
-      const availability = await LanguageModel.availability();
-      if (availability === 'unavailable') {
-        throw new Error("Chrome AI is not available. Please check that you have the required hardware and Chrome settings enabled.");
-      } else if (availability === 'downloadable') {
-        console.log("Chrome AI model needs to be downloaded. This may take a few minutes on first use.");
-        if (!confirm("Chrome AI model needs to be downloaded for the first time. This may take a few minutes. Continue?")) {
-          notePad.value = originalContent;
-          return;
-        }
-      }
+      text = sanitizeInput(text); // Sanitize the text input
 
       if (!aiModel) {
-        aiModel = await LanguageModel.create({ outputLanguage: 'en' });
+        aiModel = await createOrCheckAIModel({ outputLanguage: 'en' });
       }
       const prompt = `${instruction}\n\nTEXT:\n\"\"\"${text}\"\"\"`;
 
