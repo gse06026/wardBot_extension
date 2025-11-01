@@ -12,6 +12,51 @@ async function ensureContentScript(tabId) {
 }
 
 let aiModel = null;
+const DEFAULT_SUMMARY_PREFERENCE = 'balanced-brief';
+const DEFAULT_QUIZ_PREFERENCE = 'challenge';
+const SUMMARY_PRESETS = {
+  'quick-bullets': {
+    prompt: 'Summarize the text into exactly three concise bullet points. Each bullet should focus on one core takeaway and stay under 12 words.',
+    heading: 'Summary · Quick bullets',
+    generating: 'Condensing into quick bullets...'
+  },
+  'balanced-brief': {
+    prompt: 'Summarize the text into three or four bullet points. Give each bullet a short context phrase plus the key takeaway in a friendly tone.',
+    heading: 'Summary · Balanced brief',
+    generating: 'Shaping a balanced summary...'
+  },
+  'deep-outline': {
+    prompt: 'Summarize the text into a short outline with section headers and sub-bullets. Highlight relationships, causes/effects, and any important numbers while staying under 120 words.',
+    heading: 'Summary · Deep outline',
+    generating: 'Drafting a structured outline...'
+  }
+};
+
+const QUIZ_PRESETS = {
+  warmup: {
+    prompt: 'Create one gentle multiple-choice question (options A, B, C) that checks basic understanding of the text. Provide the correct answer and a one-sentence explanation that encourages the learner.',
+    heading: 'Quiz · Warm-up',
+    generating: 'Building a warm-up quiz...'
+  },
+  challenge: {
+    prompt: 'Create two application-focused multiple-choice questions (options A, B, C) based on the text. After each question, provide the correct answer with a brief justification. Use plausible distractors.',
+    heading: 'Quiz · Challenge',
+    generating: 'Crafting a challenge quiz...'
+  },
+  'exam-mode': {
+    prompt: 'Create three assessment questions drawn from the text. Include at least one multiple-choice item (options A, B, C) and one short-answer prompt. After listing the questions, provide an answer key with concise reasoning for each.',
+    heading: 'Quiz · Exam mode',
+    generating: 'Preparing exam-mode questions...'
+  }
+};
+
+let userPreferences = {
+  summary: DEFAULT_SUMMARY_PREFERENCE,
+  quiz: DEFAULT_QUIZ_PREFERENCE
+};
+
+const getSummaryPreset = () => SUMMARY_PRESETS[userPreferences.summary] || SUMMARY_PRESETS[DEFAULT_SUMMARY_PREFERENCE];
+const getQuizPreset = () => QUIZ_PRESETS[userPreferences.quiz] || QUIZ_PRESETS[DEFAULT_QUIZ_PREFERENCE];
 
 // Centralized AI availability checking function
 async function createOrCheckAIModel(options = {}) {
@@ -31,9 +76,14 @@ async function createOrCheckAIModel(options = {}) {
     }
   }
   
-  return await LanguageModel.create({ 
-    outputLanguage: options.outputLanguage || 'en',
-    ...options 
+  const { outputLanguage = 'en', ...rest } = options;
+
+  return await LanguageModel.create({
+    expectedOutputs: [{
+      type: 'text',
+      languages: [outputLanguage]
+    }],
+    ...rest
   });
 }
 
@@ -177,6 +227,17 @@ JSON response:`;
 });
 
 document.addEventListener('DOMContentLoaded', () => {
+  chrome.storage.sync.get(
+    {
+      summaryPreference: DEFAULT_SUMMARY_PREFERENCE,
+      quizPreference: DEFAULT_QUIZ_PREFERENCE
+    },
+    (data) => {
+      userPreferences.summary = data.summaryPreference || DEFAULT_SUMMARY_PREFERENCE;
+      userPreferences.quiz = data.quizPreference || DEFAULT_QUIZ_PREFERENCE;
+    }
+  );
+
   chrome.storage.local.get('textToAdd', (data) => {
     if (data.textToAdd) {
       const notePad = document.getElementById('notePad');
@@ -199,11 +260,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      await processTextWithAI(
-        textToSummarize,
-        'Summarize the following text into a few key bullet points:',
-        'Summary'
-      );
+      await processTextWithAI({
+        text: textToSummarize,
+        mode: 'summary'
+      });
     });
   }
 
@@ -215,32 +275,38 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      await processTextWithAI(
-        textForQuiz,
-        'Based on the following text, create a multiple-choice question with 3 options (A, B, C) and indicate the correct answer.',
-        'Quiz'
-      );
+      await processTextWithAI({
+        text: textForQuiz,
+        mode: 'quiz'
+      });
     });
   }
 
-  async function processTextWithAI(text, instruction, type) {
+  async function processTextWithAI({ text, mode }) {
+    const preset = mode === 'summary' ? getSummaryPreset() : getQuizPreset();
+    const generatingMessage = preset.generating || `Generating ${mode}...`;
     const originalContent = notePad.value;
-    notePad.value = `Generating ${type}... Please wait.`;
+    notePad.value = generatingMessage;
 
     try {
-      text = sanitizeInput(text); // Sanitize the text input
+      const sanitizedText = sanitizeInput(text);
 
       if (!aiModel) {
         aiModel = await createOrCheckAIModel({ outputLanguage: 'en' });
       }
-      const prompt = `${instruction}\n\nTEXT:\n\"\"\"${text}\"\"\"`;
 
+      const prompt = `${preset.prompt}\n\nTEXT:\n"""${sanitizedText}"""`;
       const response = await aiModel.prompt(prompt, { outputLanguage: 'en' });
-      notePad.value = `${originalContent}\n\n--- ${type.toUpperCase()} ---\n${response}\n`;
+      const cleanedResponse = response.trim();
 
+      const trimmedOriginal = originalContent.trimEnd();
+      const baseText = trimmedOriginal.length ? `${trimmedOriginal}\n\n` : '';
+      notePad.value = `${baseText}--- ${preset.heading} ---\n${cleanedResponse}\n`;
+      notePad.scrollTop = notePad.scrollHeight;
     } catch (error) {
-      console.error(`Error generating ${type}:`, error);
-      alert(`Failed to generate ${type}: ${error.message}`);
+      const readableMode = mode === 'summary' ? 'summary' : 'quiz';
+      console.error(`Error generating ${readableMode}:`, error);
+      alert(`Failed to generate ${readableMode}: ${error.message}`);
       notePad.value = originalContent;
     }
   }
@@ -252,3 +318,21 @@ document.addEventListener('visibilitychange', () => {
     aiModel = null;
   }
 });
+
+if (chrome?.storage?.onChanged) {
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName !== 'sync') {
+      return;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(changes, 'summaryPreference')) {
+      const updatedSummary = changes.summaryPreference?.newValue;
+      userPreferences.summary = updatedSummary || DEFAULT_SUMMARY_PREFERENCE;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(changes, 'quizPreference')) {
+      const updatedQuiz = changes.quizPreference?.newValue;
+      userPreferences.quiz = updatedQuiz || DEFAULT_QUIZ_PREFERENCE;
+    }
+  });
+}

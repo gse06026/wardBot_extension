@@ -228,6 +228,40 @@
       border-color: rgba(var(--accent-rgb), 0.38);
     }
 
+    .chip.is-selected {
+      background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.2), rgba(var(--accent-rgb), 0.28));
+      color: var(--accent-strong);
+      border-color: rgba(var(--accent-rgb), 0.45);
+      box-shadow: 0 10px 24px -20px rgba(var(--accent-rgb), 0.42);
+      transform: translateY(-1px);
+    }
+
+    .chip.is-selected:hover {
+      transform: translateY(-1px);
+      border-color: rgba(var(--accent-rgb), 0.48);
+    }
+
+    .subheading {
+      margin-top: 28px;
+      font-size: 15px;
+      font-weight: 650;
+      color: var(--accent-strong);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .subheading span {
+      font-size: 18px;
+    }
+
+    .preference-helper {
+      margin: 10px 0 14px;
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
     .chip:focus-visible {
       outline: 2px solid rgba(var(--accent-rgb), 0.45);
       outline-offset: 2px;
@@ -436,6 +470,22 @@
           <button type="button" class="chip" data-value="Entrepreneurship">Entrepreneurship</button>
           <button type="button" class="chip" data-value="Cooking">Cooking</button>
           <button type="button" class="chip" data-value="Classical Music">Classical Music</button>
+        </div>
+
+        <h3 class="subheading"><span aria-hidden="true">📝</span>Summary style</h3>
+        <p class="preference-helper">Choose how Ward Bot condenses your notes before you revisit them.</p>
+        <div class="chip-group preference-group" id="summaryPreferenceGroup" role="group" aria-label="Summary style options">
+          <button type="button" class="chip" data-summary="quick-bullets">Quick bullets</button>
+          <button type="button" class="chip" data-summary="balanced-brief">Balanced brief</button>
+          <button type="button" class="chip" data-summary="deep-outline">Deep outline</button>
+        </div>
+
+        <h3 class="subheading"><span aria-hidden="true">🧠</span>Quiz focus</h3>
+        <p class="preference-helper">Tell Ward Bot how tough the comprehension check should be.</p>
+        <div class="chip-group preference-group" id="quizPreferenceGroup" role="group" aria-label="Quiz difficulty options">
+          <button type="button" class="chip" data-quiz="warmup">Warm-up</button>
+          <button type="button" class="chip" data-quiz="challenge">Challenge</button>
+          <button type="button" class="chip" data-quiz="exam-mode">Exam mode</button>
         </div>
 
         <div class="button-row">
