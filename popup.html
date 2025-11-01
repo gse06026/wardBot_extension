@@ -5,19 +5,21 @@
   <title>Ward Bot</title>
   <style>
     :root {
-      --primary-color: #4361ee;
-      --secondary-color: #3f37c9;
-      --accent-color: #4cc9f0;
-      --success-color: #4ade80;
-      --warning-color: #facc15;
-      --danger-color: #f87171;
-      --light-bg: #f8fafc;
-      --dark-text: #1e293b;
-      --medium-text: #475569;
-      --light-text: #94a3b8;
-      --border-radius: 12px;
-      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --primary-color: #f4f3ee;
+      --secondary-color: #ece7e0;
+      --accent-color: #c15f3c;
+      --accent-strong: #d8724b;
+      --accent-rgb: 193, 95, 60;
+      --surface-color: rgba(255, 255, 255, 0.92);
+      --surface-border: rgba(193, 95, 60, 0.1);
+      --surface-hover: rgba(255, 255, 255, 0.97);
+      --success-color: #4ba27c;
+      --success-bg: rgba(75, 162, 124, 0.12);
+      --text-strong: #2f2724;
+      --text-muted: #6f645f;
+      --chip-bg: rgba(var(--accent-rgb), 0.12);
+      --border-radius: 16px;
+      --shadow: 0 24px 44px -28px rgba(47, 35, 29, 0.35);
     }
 
     * {
@@ -26,282 +28,299 @@
       box-sizing: border-box;
     }
 
+    html {
+      background-color: #f4f3ee;
+    }
+
     body {
-      width: 380px;
+      width: 360px;
+      min-height: 520px;
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-      padding: 20px;
-      color: var(--dark-text);
+      color: var(--text-strong);
+      background-color: #f4f3ee;
+      background-image:
+        radial-gradient(circle at 12% -8%, rgba(var(--accent-rgb), 0.14), transparent 58%),
+        linear-gradient(160deg, #f6f3ef 0%, #f1ebe5 45%, #ede4dd 100%);
+      background-repeat: no-repeat, no-repeat;
+      background-attachment: fixed, fixed;
+      padding: 28px 20px 32px;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle farthest-corner at 55% 120%, rgba(var(--accent-rgb), 0.12), transparent 78%);
+      z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
 
     .header {
       text-align: center;
-      margin-bottom: 20px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     }
 
-    .header h3 {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--secondary-color);
-      margin: 0;
-      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .header p {
-      font-size: 14px;
-      color: var(--medium-text);
-      margin-top: 4px;
-    }
-
-    .card {
-      background: white;
-      border-radius: var(--border-radius);
-      padding: 20px;
-      margin-bottom: 18px;
-      box-shadow: var(--shadow);
-      transition: all 0.3s ease;
-    }
-
-    .card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-hover);
-    }
-
-    .card-title {
-      display: flex;
-      align-items: center;
-      margin-bottom: 15px;
-      color: var(--secondary-color);
-      font-weight: 600;
-      font-size: 16px;
-    }
-
-    .card-title .step {
+    .badge {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 24px;
-      height: 24px;
-      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-      color: white;
-      border-radius: 50%;
-      font-size: 12px;
       font-weight: 600;
-      margin-right: 10px;
+      letter-spacing: 0.6px;
+      background: rgba(var(--accent-rgb), 0.12);
+      color: var(--accent-strong);
+      border: 1px solid rgba(var(--accent-rgb), 0.35);
+      padding: 6px 14px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      font-size: 12px;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 22px -18px rgba(var(--accent-rgb), 0.32);
+    }
+
+    .header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--accent-strong);
+      margin-bottom: 6px;
+      text-shadow: 0 6px 20px rgba(var(--accent-rgb), 0.2);
+    }
+
+    .tagline {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .container {
+      display: grid;
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--surface-color);
+      border-radius: var(--border-radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--surface-border);
+      backdrop-filter: blur(16px);
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      background: var(--surface-hover);
+      border-color: rgba(var(--accent-rgb), 0.28);
+      box-shadow: 0 28px 60px -32px rgba(47, 35, 29, 0.3);
+    }
+
+    .card-heading {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .step {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      flex: 0 0 32px;
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      border: 1px solid rgba(var(--accent-rgb), 0.3);
+      background: rgba(var(--accent-rgb), 0.12);
+      color: var(--accent-strong);
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 1;
+      box-shadow: 0 8px 16px -12px rgba(var(--accent-rgb), 0.28);
+    }
+
+    .card-heading h2 {
+      font-size: 16px;
+      font-weight: 650;
+      color: var(--accent-strong);
+      margin-bottom: 4px;
+    }
+
+    .card-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.45;
     }
 
     textarea {
       width: 100%;
-      padding: 14px;
-      border: 2px solid #e2e8f0;
-      border-radius: 10px;
+      padding: 14px 16px;
+      border: 1.5px solid rgba(111, 100, 95, 0.25);
+      border-radius: 12px;
       font-family: inherit;
       font-size: 14px;
       resize: vertical;
-      min-height: 80px;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-      margin-bottom: 15px;
+      min-height: 88px;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--text-strong);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
     }
 
     textarea:focus {
       outline: none;
-      border-color: var(--accent-color);
-      box-shadow: 0 0 0 3px rgba(76, 201, 240, 0.1);
+      border-color: rgba(var(--accent-rgb), 0.55);
+      box-shadow: 0 0 0 4px rgba(var(--accent-rgb), 0.16);
+      transform: translateY(-1px);
     }
 
     textarea::placeholder {
-      color: var(--light-text);
-      opacity: 0.8;
+      color: rgba(111, 100, 95, 0.55);
+    }
+
+    .helper-text {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 10px;
+      line-height: 1.45;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 18px;
+      flex-wrap: wrap;
     }
 
     .btn {
-      width: 100%;
+      flex: 1 1 140px;
       padding: 12px 16px;
       border: none;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 600;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 650;
       cursor: pointer;
-      transition: all 0.3s ease;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.3px;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, color 0.25s ease;
+      text-transform: none;
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-      color: white;
-      box-shadow: 0 4px 6px rgba(67, 97, 238, 0.25);
+      background: linear-gradient(135deg, var(--accent-color), var(--accent-strong));
+      color: #ffffff;
+      box-shadow: 0 16px 30px -20px rgba(var(--accent-rgb), 0.38);
     }
 
     .btn-primary:hover {
-      background: linear-gradient(135deg, var(--secondary-color), #3a30a0);
-      transform: translateY(-1px);
-      box-shadow: 0 6px 12px rgba(67, 97, 238, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 24px 38px -26px rgba(var(--accent-rgb), 0.46);
+      filter: brightness(1.03);
     }
 
     .btn-secondary {
-      background: linear-gradient(135deg, #64748b, #475569);
-      color: white;
-      box-shadow: 0 4px 6px rgba(100, 116, 139, 0.25);
+      background: rgba(var(--accent-rgb), 0.08);
+      color: var(--accent-strong);
+      border: 1px solid rgba(var(--accent-rgb), 0.24);
     }
 
     .btn-secondary:hover {
-      background: linear-gradient(135deg, #475569, #334155);
-      transform: translateY(-1px);
-      box-shadow: 0 6px 12px rgba(100, 116, 139, 0.3);
-    }
-
-    .btn-outline {
-      background: transparent;
-      border: 2px solid var(--primary-color);
-      color: var(--primary-color);
-    }
-
-    .btn-outline:hover {
-      background: var(--primary-color);
-      color: white;
+      transform: translateY(-2px);
+      background: rgba(var(--accent-rgb), 0.18);
+      border-color: rgba(var(--accent-rgb), 0.35);
     }
 
     .note-buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      display: flex;
       gap: 12px;
+      margin-top: 18px;
+      flex-wrap: wrap;
     }
 
     .btn-note {
-      background: linear-gradient(135deg, var(--accent-color), #4895ef);
-      color: white;
+      flex: 1 1 140px;
+      background: rgba(var(--accent-rgb), 0.14);
+      color: var(--accent-strong);
+      border: 1px solid rgba(var(--accent-rgb), 0.26);
     }
 
     .btn-note:hover {
-      background: linear-gradient(135deg, #4895ef, #3a86ff);
-      transform: translateY(-1px);
-    }
-
-    .btn-summarize {
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-    }
-
-    .btn-summarize:hover {
-      background: linear-gradient(135deg, #16a34a, #15803d);
-    }
-
-    .btn-quiz {
-      background: linear-gradient(135deg, #f59e0b, #d97706);
-    }
-
-    .btn-quiz:hover {
-      background: linear-gradient(135deg, #d97706, #b45309);
-    }
-
-    .feature-icon {
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-      border-radius: 50%;
-      margin-right: 12px;
-    }
-
-    .feature-icon i {
-      color: white;
-      font-size: 18px;
-    }
-
-    .input-group {
-      position: relative;
-      margin-bottom: 15px;
-    }
-
-    .input-group textarea {
-      margin-bottom: 0;
-    }
-
-    .input-group button {
-      position: absolute;
-      right: 12px;
-      bottom: 12px;
-      width: auto;
-      padding: 6px 12px;
-      font-size: 14px;
-      text-transform: none;
-      letter-spacing: normal;
-    }
-
-    .input-group .btn-clear {
-      background: rgba(255, 255, 255, 0.9);
-      border: 1px solid #e2e8f0;
-      color: var(--medium-text);
-    }
-
-    .input-group .btn-clear:hover {
-      background: var(--light-bg);
-      color: var(--dark-text);
-    }
-
-    .action-section {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .divider {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
-      margin: 15px 0;
+      transform: translateY(-2px);
+      background: rgba(var(--accent-rgb), 0.22);
+      border-color: rgba(var(--accent-rgb), 0.38);
     }
 
     .footer {
       text-align: center;
-      padding: 10px 0;
-      color: var(--medium-text);
+      margin-top: 6px;
       font-size: 12px;
+      color: rgba(111, 100, 95, 0.65);
+    }
+
+    .footer span {
+      color: var(--accent-strong);
+      font-weight: 600;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition-duration: 0.001ms !important;
+        animation-duration: 0.001ms !important;
+      }
+
+      .card, .btn {
+        transform: none !important;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="header">
-    <h3>Ward Bot</h3>
-    <p>AI-powered research assistant</p>
-  </div>
+  <div class="page">
+    <header class="header">
+      <div class="badge">Ward Bot</div>
+      <h1>Quick Actions</h1>
+      <p class="tagline">Guide your research without leaving the page.</p>
+    </header>
 
-  <div class="card">
-    <div class="card-title">
-      <span class="step">1</span>
-      Ask about this page
-    </div>
-    <div class="input-group">
-      <textarea id="questionInput" placeholder="e.g., Explain the concept of 'VPC'..."></textarea>
-    </div>
-    <div class="action-section">
-      <button id="searchButton" class="btn btn-primary">Find on Page</button>
-      <button id="clearButton" class="btn btn-secondary" style="margin-top: 8px;">Clear Highlights</button>
-    </div>
-  </div>
+    <main class="container">
+      <section class="card">
+        <div class="card-heading">
+          <span class="step">1</span>
+          <div>
+            <h2>Ask about this page</h2>
+            <p class="card-subtitle">Highlight the most relevant sections tied to your question.</p>
+          </div>
+        </div>
+        <textarea id="questionInput" placeholder="e.g., What is a VPC in this context?"></textarea>
+        <div class="action-row">
+          <button id="searchButton" class="btn btn-primary">Find on page</button>
+          <button id="clearButton" class="btn btn-secondary">Clear highlights</button>
+        </div>
+      </section>
 
-  <div class="divider"></div>
+      <section class="card">
+        <div class="card-heading">
+          <span class="step">2</span>
+          <div>
+            <h2>AI study note</h2>
+            <p class="card-subtitle">Drop snippets here for summarizing or quiz prep.</p>
+          </div>
+        </div>
+        <textarea id="notePad" placeholder="Paste any text you want Ward Bot to transform..."></textarea>
+        <div class="note-buttons">
+          <button id="summarizeButton" class="btn btn-note">Summarize</button>
+          <button id="quizButton" class="btn btn-note">Make a quiz</button>
+        </div>
+      </section>
+    </main>
 
-  <div class="card">
-    <div class="card-title">
-      <span class="step">2</span>
-      AI Study Note
-    </div>
-    <textarea id="notePad" placeholder="Copy-paste text here from any source, or from your findings above..."></textarea>
-    <div class="note-buttons">
-      <button id="summarizeButton" class="btn btn-note btn-summarize">Summarize</button>
-      <button id="quizButton" class="btn btn-note btn-quiz">Make a Quiz</button>
-    </div>
-  </div>
-
-  <div class="footer">
-    <p>Ward Bot v1.0 ・ AI Research Assistant</p>
+    <footer class="footer">
+      <p><span>Ward Bot</span> v1.0 · AI Research Assistant</p>
+    </footer>
   </div>
   <script src="popup.js"></script>
 </body>

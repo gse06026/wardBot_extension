@@ -2,24 +2,476 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ward Bot Settings</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; }
-    .container { max-width: 400px; }
-    label { display: block; margin-bottom: 5px; font-weight: bold; }
-    input { width: 100%; padding: 8px; margin-bottom: 15px; }
-    button { padding: 10px 15px; background-color: #28a745; color: white; border: none; cursor: pointer; }
-    #status { margin-top: 15px; color: green; font-weight: bold; }
+    :root {
+      --primary-color: #f4f3ee;
+      --secondary-color: #ece7e0;
+      --accent-color: #c15f3c;
+      --accent-strong: #d8724b;
+      --accent-rgb: 193, 95, 60;
+      --surface-color: rgba(255, 255, 255, 0.92);
+      --surface-border: rgba(193, 95, 60, 0.12);
+      --surface-hover: rgba(255, 255, 255, 0.98);
+      --success-color: #4ba27c;
+      --success-bg: rgba(75, 162, 124, 0.12);
+      --text-strong: #2f2724;
+      --text-muted: #6f645f;
+      --chip-bg: rgba(var(--accent-rgb), 0.12);
+      --chip-text: #c15f3c;
+      --border-radius: 16px;
+      --shadow: 0 24px 44px -28px rgba(47, 35, 29, 0.35);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background-color: #f4f3ee;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      color: var(--text-strong);
+      background-color: #f4f3ee;
+      background-image:
+        radial-gradient(circle at 12% -8%, rgba(var(--accent-rgb), 0.14), transparent 60%),
+        linear-gradient(160deg, #f6f3ef 0%, #f1ebe5 45%, #ede4dd 100%);
+      background-repeat: no-repeat, no-repeat;
+      background-attachment: fixed, fixed;
+      padding: 48px 20px 64px;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle farthest-corner at 55% 120%, rgba(var(--accent-rgb), 0.12), transparent 80%);
+      z-index: 0;
+    }
+
+    .page {
+      width: min(540px, 100%);
+      position: relative;
+      z-index: 1;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      letter-spacing: 0.6px;
+      background: rgba(var(--accent-rgb), 0.12);
+      color: var(--accent-strong);
+      border: 1px solid rgba(var(--accent-rgb), 0.35);
+      padding: 6px 14px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      font-size: 12px;
+      margin-bottom: 18px;
+      box-shadow: 0 10px 22px -18px rgba(var(--accent-rgb), 0.32);
+    }
+
+    .header h1 {
+      font-size: clamp(28px, 4vw, 34px);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 10px;
+      color: var(--accent-strong);
+      text-shadow: 0 6px 24px rgba(var(--accent-rgb), 0.25);
+    }
+
+    .tagline {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 420px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    .container {
+      display: grid;
+      gap: 22px;
+    }
+
+    .card {
+      background: var(--surface-color);
+      border-radius: var(--border-radius);
+      padding: 26px 28px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--surface-border);
+      backdrop-filter: blur(18px);
+      transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      background: var(--surface-hover);
+      border-color: rgba(var(--accent-rgb), 0.28);
+      box-shadow: 0 28px 60px -32px rgba(47, 35, 29, 0.3);
+    }
+
+    .card-heading {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .card-heading h2 {
+      font-size: 20px;
+      font-weight: 650;
+      color: var(--accent-strong);
+      margin-bottom: 6px;
+    }
+
+    .card-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .card .icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      font-size: 18px;
+      background: rgba(var(--accent-rgb), 0.14);
+      color: var(--accent-strong);
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 15px;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid rgba(111, 100, 95, 0.25);
+      border-radius: 12px;
+      font-size: 15px;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--text-strong);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: rgba(var(--accent-rgb), 0.55);
+      box-shadow: 0 0 0 4px rgba(var(--accent-rgb), 0.18);
+      transform: translateY(-1px);
+    }
+
+    input[type="text"]::placeholder {
+      color: rgba(111, 100, 95, 0.55);
+    }
+
+    .helper-text {
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .chip-group {
+      margin-top: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .chip-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-right: 2px;
+    }
+
+    .chip {
+      border: 1px solid rgba(var(--accent-rgb), 0.22);
+      border-radius: 999px;
+      padding: 8px 14px;
+      background: var(--chip-bg);
+      color: var(--chip-text);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .chip:hover {
+      transform: translateY(-2px);
+      background: rgba(var(--accent-rgb), 0.18);
+      border-color: rgba(var(--accent-rgb), 0.38);
+    }
+
+    .chip:focus-visible {
+      outline: 2px solid rgba(var(--accent-rgb), 0.45);
+      outline-offset: 2px;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      flex: 1 1 160px;
+      padding: 14px 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 650;
+      cursor: pointer;
+      letter-spacing: 0.4px;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, color 0.25s ease;
+      text-transform: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-color), var(--accent-strong));
+      color: #ffffff;
+      box-shadow: 0 14px 32px -22px rgba(var(--accent-rgb), 0.4);
+    }
+
+    .btn-secondary {
+      background: rgba(var(--accent-rgb), 0.08);
+      color: var(--accent-strong);
+      border: 1px solid rgba(var(--accent-rgb), 0.22);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 20px 44px -26px rgba(var(--accent-rgb), 0.48);
+      filter: brightness(1.03);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(var(--accent-rgb), 0.16);
+      border-color: rgba(var(--accent-rgb), 0.35);
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid rgba(var(--accent-rgb), 0.45);
+      outline-offset: 2px;
+    }
+
+    .status-container {
+      display: none;
+      margin-top: 20px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      font-weight: 550;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid transparent;
+      background: rgba(255, 255, 255, 0.75);
+    }
+
+    .status-container.show {
+      display: flex;
+    }
+
+    .status-success {
+      background: var(--success-bg);
+      color: var(--accent-strong);
+      border-color: rgba(119, 216, 161, 0.35);
+    }
+
+    .status-success .status-icon {
+      background: rgba(119, 216, 161, 0.22);
+      color: var(--success-color);
+    }
+
+    .status-icon {
+      width: 24px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 14px;
+    }
+
+    .bullet-list {
+      list-style: none;
+      display: grid;
+      gap: 12px;
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .bullet-list li {
+      position: relative;
+      padding-left: 28px;
+    }
+
+    .bullet-list li::before {
+      content: '';
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-color);
+      box-shadow: 0 0 0 4px rgba(var(--accent-rgb), 0.18);
+    }
+
+    .callout {
+      margin-top: 20px;
+      padding: 16px 18px;
+      border-radius: 14px;
+      background: rgba(var(--accent-rgb), 0.12);
+      border: 1px solid rgba(var(--accent-rgb), 0.26);
+      font-size: 14px;
+      color: var(--text-strong);
+      line-height: 1.55;
+    }
+
+    .callout strong {
+      color: var(--accent-strong);
+    }
+
+    .footer {
+      margin-top: 28px;
+      text-align: center;
+      font-size: 13px;
+      color: rgba(111, 100, 95, 0.65);
+    }
+
+    .footer span {
+      color: var(--accent-strong);
+      font-weight: 600;
+    }
+
+    @media (max-width: 520px) {
+      body {
+        padding: 36px 16px 52px;
+      }
+
+      .card {
+        padding: 24px;
+      }
+
+      .button-row {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition-duration: 0.001ms !important;
+        animation-duration: 0.001ms !important;
+      }
+
+      .card, .chip, .btn {
+        transform: none !important;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Ward Bot Settings</h2>
-    <label for="interest">My Interest:</label>
-    <input type="text" id="interest" placeholder="e.g., League of Legends, Soccer, Cooking...">
-    <button id="saveButton">Save</button>
-    <div id="status"></div>
+  <div class="page">
+    <header class="header">
+      <div class="badge">Ward Bot</div>
+      <h1>Personalize Your Co-Pilot</h1>
+      <p class="tagline">Shape how Ward Bot explains ideas so analogies land in your world.</p>
+    </header>
+
+    <main class="container">
+      <section class="card settings-card">
+        <div class="card-heading">
+          <span class="icon" aria-hidden="true">⚙️</span>
+          <div>
+            <h2>Personal Preferences</h2>
+            <p class="card-subtitle">Tell Ward Bot what you're into and we'll tailor explanations to match.</p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="interest">Focus area</label>
+          <input type="text" id="interest" placeholder="e.g., League of Legends, Product Design, Cooking..." autocomplete="off">
+          <p class="helper-text">Ward Bot uses this to craft metaphors, examples, and analogies that feel familiar.</p>
+        </div>
+
+        <div class="chip-group" aria-label="Quick interest suggestions">
+          <span class="chip-label">Quick picks:</span>
+          <button type="button" class="chip" data-value="League of Legends">League of Legends</button>
+          <button type="button" class="chip" data-value="Data Science">Data Science</button>
+          <button type="button" class="chip" data-value="Product Design">Product Design</button>
+          <button type="button" class="chip" data-value="Entrepreneurship">Entrepreneurship</button>
+          <button type="button" class="chip" data-value="Cooking">Cooking</button>
+          <button type="button" class="chip" data-value="Classical Music">Classical Music</button>
+        </div>
+
+        <div class="button-row">
+          <button id="saveButton" type="button" class="btn btn-primary">Save preferences</button>
+          <button id="clearButton" type="button" class="btn btn-secondary">Clear</button>
+        </div>
+
+        <div id="status" class="status-container" role="status" aria-live="polite"></div>
+      </section>
+
+      <section class="card about-card">
+        <div class="card-heading">
+          <span class="icon" aria-hidden="true">💡</span>
+          <div>
+            <h2>About Ward Bot</h2>
+            <p class="card-subtitle">A focused Chrome companion that keeps research grounded and fast.</p>
+          </div>
+        </div>
+
+        <ul class="bullet-list">
+          <li>Chrome's built-in AI runs locally — your prompts and preferences never leave the browser.</li>
+          <li>Ward Bot swaps between explanation styles to keep complex topics engaging.</li>
+          <li>Update your focus area whenever you pivot projects, games, or hobbies.</li>
+        </ul>
+
+        <div class="callout">
+          <strong>Pro tip:</strong> Pair Ward Bot with reading mode to capture insights quickly, then let analogies boost recall.
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p><span>Ward Bot</span> v1.0 · AI Research Assistant</p>
+    </footer>
   </div>
+
   <script src="options.js"></script>
 </body>
 </html>
