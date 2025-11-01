@@ -38,6 +38,7 @@
 
 - Collect highlighted text into a notepad
 - Generate summaries and quiz questions with one click
+- Tune summary and quiz style in settings (quick bullets vs deep outline, warm-up vs exam mode)
 - Build your own knowledge base while browsing
 
 ---
@@ -82,6 +83,7 @@
 
 1. `chrome://extensions` → Options under Ward Bot
 2. Enter your interests → Click **Save**
+3. Pick your preferred summary style and quiz difficulty — selections auto-save
 
 ---
 

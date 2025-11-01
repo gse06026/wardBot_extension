@@ -2,7 +2,11 @@ const interestInput = document.getElementById('interest');
 const saveButton = document.getElementById('saveButton');
 const clearButton = document.getElementById('clearButton');
 const statusDiv = document.getElementById('status');
-const chips = Array.from(document.querySelectorAll('.chip'));
+const interestChips = Array.from(document.querySelectorAll('.chip[data-value]'));
+const summaryChips = Array.from(document.querySelectorAll('.chip[data-summary]'));
+const quizChips = Array.from(document.querySelectorAll('.chip[data-quiz]'));
+const DEFAULT_SUMMARY_PREF = 'balanced-brief';
+const DEFAULT_QUIZ_PREF = 'challenge';
 let statusTimeoutId;
 
 const showStatus = (message) => {
@@ -22,7 +26,29 @@ const showStatus = (message) => {
 
 const persistInterest = (interest) => {
   chrome.storage.sync.set({ userInterest: interest }, () => {
-    showStatus('Preferences saved');
+    showStatus('Focus area saved');
+  });
+};
+
+const persistSummaryPreference = (value) => {
+  chrome.storage.sync.set({ summaryPreference: value }, () => {
+    showStatus('Summary style updated');
+  });
+};
+
+const persistQuizPreference = (value) => {
+  chrome.storage.sync.set({ quizPreference: value }, () => {
+    showStatus('Quiz focus updated');
+  });
+};
+
+const selectChip = (chipCollection, selectedValue, dataAttr) => {
+  chipCollection.forEach((chip) => {
+    if (chip.dataset[dataAttr] === selectedValue) {
+      chip.classList.add('is-selected');
+    } else {
+      chip.classList.remove('is-selected');
+    }
   });
 };
 
@@ -43,7 +69,7 @@ if (clearButton) {
   });
 }
 
-chips.forEach((chip) => {
+interestChips.forEach((chip) => {
   chip.addEventListener('click', () => {
     const value = chip.dataset.value || chip.textContent.trim();
     interestInput.value = value;
@@ -52,6 +78,28 @@ chips.forEach((chip) => {
       const end = interestInput.value.length;
       interestInput.setSelectionRange(end, end);
     }
+  });
+});
+
+summaryChips.forEach((chip) => {
+  chip.addEventListener('click', () => {
+    const value = chip.dataset.summary;
+    if (!value) {
+      return;
+    }
+    selectChip(summaryChips, value, 'summary');
+    persistSummaryPreference(value);
+  });
+});
+
+quizChips.forEach((chip) => {
+  chip.addEventListener('click', () => {
+    const value = chip.dataset.quiz;
+    if (!value) {
+      return;
+    }
+    selectChip(quizChips, value, 'quiz');
+    persistQuizPreference(value);
   });
 });
 
@@ -69,9 +117,18 @@ if (interestInput) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  chrome.storage.sync.get('userInterest', (data) => {
-    if (data.userInterest) {
-      interestInput.value = data.userInterest;
+  chrome.storage.sync.get(
+    {
+      userInterest: '',
+      summaryPreference: DEFAULT_SUMMARY_PREF,
+      quizPreference: DEFAULT_QUIZ_PREF
+    },
+    (data) => {
+      if (data.userInterest) {
+        interestInput.value = data.userInterest;
+      }
+      selectChip(summaryChips, data.summaryPreference || DEFAULT_SUMMARY_PREF, 'summary');
+      selectChip(quizChips, data.quizPreference || DEFAULT_QUIZ_PREF, 'quiz');
     }
-  });
+  );
 });
